@@ -25,5 +25,22 @@ post {{url}}/login
 }
 
 ###
+post {{url}}/createArticle
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+{{json}}
+
+{
+    "content":"文章内容"
+}
+
+###
+get {{url}}/getArticle
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+
+###
 get {{url}}/file
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkZGI1ZjgwMDdmODU3MzQ4ODIwODA3NCIsImlhdCI6MTU3NDY1NzkyOH0.ghSOr3e3SWkdFBacuusNw93TnTC8WdLtsrPibXesUB0
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+
+### 
+get {{url}}/getUser
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc

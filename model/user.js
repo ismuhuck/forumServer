@@ -23,6 +23,10 @@ var userSchema = new Schema({
             return bcrypt.hashSync(val,10)
         }
     },
+    avatar:{
+        type:String,
+        default:'http://localhost:5000/imgs/ata.jpg'
+    },
     startTime:{
         type:Date,
         default:Date.now
