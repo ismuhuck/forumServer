@@ -1,0 +1,29 @@
+@url=http://localhost:5000/api 
+@json=Content-Type: application/json
+
+###
+POST  {{url}}/register
+{{json}}
+
+{
+    "email":"1562288394@qqs.com",
+    "nickName":"咖咖ka",
+    "password":"1234563"
+}
+
+###
+get {{url}}/users
+{{json}}
+
+###
+post {{url}}/login
+{{json}}
+
+{
+    "email":"1562288394@qqa.com",
+    "password":"1234563"
+}
+
+###
+get {{url}}/file
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkZGI1ZjgwMDdmODU3MzQ4ODIwODA3NCIsImlhdCI6MTU3NDY1NzkyOH0.ghSOr3e3SWkdFBacuusNw93TnTC8WdLtsrPibXesUB0
