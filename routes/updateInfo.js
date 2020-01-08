@@ -21,6 +21,10 @@ var upload = multer({ storage: storage})
 // 修改用户头像接口
 router.post('/api/uploadAva',auth,upload.single('avatar'),async (req,res) =>{
     var file = req.file
+    let avaPath = "http://localhost:5000/"+file.filename
+    var user = await User.update({_id:req.user._id},{$set:{
+        avatar:avaPath
+    }})
     res.json({
         code:0,
         msg:'文件上传成功'
@@ -58,7 +62,6 @@ router.post('/api/info',auth,async (req,res) => {
         user:user
     })
 })
-
 
 
 // 修改密码接口
