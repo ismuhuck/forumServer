@@ -36,17 +36,15 @@ router.post('/api/info',auth,async (req,res) => {
     var id = req.user._id
     let body = req.body
     var isEmail = await User.findOne({email:body.email})
-    var isNickName = await User.findOne({nickName:body.nickName})
-    if(isNickName){
-        return res.status(200).json({code:3})
-    }
+    // var isNickName = await User.findOne({nickName:body.nickName})
+    // if(isNickName){
+    //     return res.status(200).json({code:3})
+    // }
     if(isEmail){
         return res.status(200).json({code:2})
     }
     
     var user =await User.update({_id:id},{$set:{
-        email:body.email,
-        nickName:body.nickName,
         address:body.address,
         company:body.company,
         qq:body.qq,
@@ -63,6 +61,39 @@ router.post('/api/info',auth,async (req,res) => {
     })
 })
 
+// 修改昵称
+router.post('/api/nickName',auth, async (req,res) => {
+    let body = req.body
+    var id = req.user._id
+    var isNickName = await User.findOne({nickName:body.nickName})
+    if(isNickName){
+        return res.status(200).json({code:3})
+    }
+    var user =await User.update({_id:id},{$set:{
+        nickName:body.nickName
+    }})
+    res.json({
+        code:0,
+        user:user
+    })
+})
+
+// 修改邮箱
+router.post('/api/email',auth,async (req,res) => {
+    let body = req.body
+    var id = req.user._id
+    var isEmail = await User.findOne({email:body.email})
+    if(isEmail){
+        return res.status(200).json({code:2})
+    }
+    var user =await User.update({_id:id},{$set:{
+        email:body.email
+    }})
+    res.json({
+        code:0,
+        user:user
+    })
+})
 
 // 修改密码接口
 router.post('/api/updatePass',auth,async (req,res) => {
