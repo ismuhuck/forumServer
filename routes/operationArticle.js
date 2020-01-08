@@ -1,3 +1,4 @@
+//  发表文章接口
 var express = require('express')
 var User = require('../model/user')
 var Article = require('../model/article ')
@@ -8,6 +9,7 @@ var router = express.Router()
 router.post('/api/createArticle',auth,async (req,res) =>{
     let article =await Article.create(
         {
+            blogTitle:req.body.blogTitle,
             content:req.body.content,
             userId:req.user._id
         }
@@ -24,6 +26,7 @@ router.post('/api/createArticle',auth,async (req,res) =>{
     })
 })
 // 不使用async异步函数的写法
+//  个人主页获取个人全部文章接口
 router.get('/api/getArticle',auth,(req,res) =>{
     let id = req.user._id
     Article.find({
@@ -31,9 +34,9 @@ router.get('/api/getArticle',auth,(req,res) =>{
     },(err,docs) => {
         if(!err){
             return res.json(docs)
-        }
-        
-    })
+        } 
+    }) 
     //  return res.json(allArticle)
 })
+
 module.exports = router

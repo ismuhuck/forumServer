@@ -27,6 +27,16 @@ var userSchema = new Schema({
         type:String,
         default:'http://localhost:5000/imgs/ata.jpg'
     },
+    address:{
+        type:String
+    },
+    company:{//所在公司
+        type:String
+    },
+    qq:String,
+    qianming:{
+        type:String
+    },
     startTime:{
         type:Date,
         default:Date.now

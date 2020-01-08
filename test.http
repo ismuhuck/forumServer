@@ -26,7 +26,7 @@ post {{url}}/login
 
 ###
 post {{url}}/createArticle
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw
 {{json}}
 
 {
@@ -34,13 +34,22 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzM
 }
 
 ###
+POST {{url}}/updatePass
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw
+{{json}}
+
+{
+    "password":"123456"
+}
+
+###
 get {{url}}/getArticle
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw
 
 ###
 get {{url}}/file
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw
 
 ### 
 get {{url}}/getUser
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTJhYjMzMzBhOGE0MmVmYzI3YzFmOSIsImlhdCI6MTU3ODI4NzYyNH0.DvfIu2k1yZHhCBcfUHd-vQvi88mzDXyCMOehyX_laYc
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw

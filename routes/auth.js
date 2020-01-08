@@ -5,6 +5,7 @@ const auth = async(req,res,next) => {
     //配置验证中间件
     try {
     const raw = String(req.headers.authorization).split(" ").pop()
+    // console.log(req.url + ':' + raw)
     const tokenData = jwt.verify(raw,SECRET)//验证token
     const {id} = tokenData
     req.user = await User.findById(id)
