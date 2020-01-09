@@ -1,7 +1,7 @@
 // 排行榜接口
 var express = require('express')
 var User = require('../model/user')
-var Article = require('../model/article ')
+var Article = require('../model/article')
 
 let router = express.Router()
 

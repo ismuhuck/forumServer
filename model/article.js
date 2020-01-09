@@ -15,7 +15,11 @@ var articleSchema = new Schema({
         type:Date,
         default:Date.now
     },
-    userId:String
+    userId:String,
+    userAva:String,
+    userNickname:String,
+    like:[],
+    comment:[]
 })
 
 module.exports = mongoose.model('articel',articleSchema)

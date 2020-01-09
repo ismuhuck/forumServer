@@ -1,6 +1,7 @@
 // 修改用户信息接口
 var express = require('express')
 var User = require('../model/user')
+var Article = require('../model/article')
 var auth = require('./auth')
 var bcrypt = require('bcryptjs')
 var multer = require('multer')
@@ -24,6 +25,9 @@ router.post('/api/uploadAva',auth,upload.single('avatar'),async (req,res) =>{
     let avaPath = "http://localhost:5000/"+file.filename
     var user = await User.update({_id:req.user._id},{$set:{
         avatar:avaPath
+    }})
+    await Article.update({userId:req.user._id},{$set:{
+        userAva:avaPath
     }})
     res.json({
         code:0,
