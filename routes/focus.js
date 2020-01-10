@@ -12,14 +12,23 @@ router.post('/api/focus',auth,async (req,res) => {
     let user = req.user
     let userId = user._id
     let focusArr = user.focus
+    let articleid = req.body.articleId
+    let article =await Article.findById(articleid)
+    let userName = article.userNickname
+    if(article.userId.toString() === user._id.toString()){
+        return res.status(200).json({
+            code:1,
+            msg:'您不可关注自己'
+        })
+    }
     let flag = focusArr.some((item,i) => {
-        return item._id.toString() === userId.toString()
+        return item._id.toString() === article.userId.toString()
     })
     if(!flag){
         let focusInfo = {
-            nickName:user.nickName,
-            avatar:user.avatar,
-            _id:user._id
+            nickName:userName,
+            avatar:article.userAva,
+            _id:article.userId
         }
         focusArr.push(focusInfo)
         await User.updateOne({_id:userId},{$set:{
@@ -33,7 +42,7 @@ router.post('/api/focus',auth,async (req,res) => {
     }
     for(let i = 0; i<focusArr.length; i++){
         let {_id:userid} = focusArr[i]
-        if(userid.toString() === userId.toString()){
+        if(userid.toString() === article.userId.toString()){
             focusArr.splice(i,1)
             await User.updateOne({_id:userId},{
                 $set:{
@@ -48,6 +57,7 @@ router.post('/api/focus',auth,async (req,res) => {
     }}
 })
 
+// 粉丝
 router.post('/api/likeme',auth,async (req,res) => {
     let user = req.user
     // 当前登录用户 ID

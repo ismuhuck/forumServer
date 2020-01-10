@@ -6,7 +6,7 @@ var Article = require('../model/article')
 let router = express.Router()
 
 router.get('/api/default',async (req,res) =>{
-    let allArticle = await Article.find()
+    let allArticle = await Article.find({isDel:"0"})
     res.json(
         {
             article:allArticle,
@@ -15,21 +15,21 @@ router.get('/api/default',async (req,res) =>{
     )
 })
 router.get('/api/week',async (req,res) =>{
-    let allArticle = await Article.find()
+    let allArticle = await Article.find({isDel:"0"})
     res.json({
         article:allArticle,
         code:0
     })
 })
 router.get('/api/mouth',async (req,res) =>{
-    let allArticle = await Article.find()
+    let allArticle = await Article.find({isDel:"0"})
     res.json({
         article:allArticle,
         code:0
     })
 })
 router.get('/api/year',async (req,res) =>{
-    let allArticle = await Article.find()
+    let allArticle = await Article.find({isDel:"0"})
     res.json({
         article:allArticle,
         code:0

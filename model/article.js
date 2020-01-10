@@ -12,14 +12,18 @@ var articleSchema = new Schema({
         required:true
     },
     createTime:{
-        type:Date,
-        default:Date.now
+        type:String
     },
-    userId:String,
+    userId:Object,
     userAva:String,
     userNickname:String,
     like:[],
-    comment:[]
+    comment:[],
+    // 0 为没有删除  1 为删除
+    isDel:{
+        type:String,
+        default:"0"
+    }
 })
 
 module.exports = mongoose.model('articel',articleSchema)
