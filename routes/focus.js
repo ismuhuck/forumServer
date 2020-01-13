@@ -28,7 +28,8 @@ router.post('/api/focus',auth,async (req,res) => {
         let focusInfo = {
             nickName:userName,
             avatar:article.userAva,
-            _id:article.userId
+            _id:article.userId,
+            qianming:article.userQianming
         }
         focusArr.push(focusInfo)
         await User.updateOne({_id:userId},{$set:{
@@ -76,7 +77,8 @@ router.post('/api/likeme',auth,async (req,res) => {
         let likemeInfo = {
             nickName:user.nickName,
             avatar:user.avatar,
-            _id:user._id
+            _id:user._id,
+            qianming:user.qianming
         }
         likemeArr.push(likemeInfo)
         await User.updateOne({_id:id},{$set:{
@@ -111,6 +113,67 @@ router.post('/api/likeme',auth,async (req,res) => {
 router.post('/api/liketext',auth,(req,res) => {
     res.status(200).json({
         code:0
+    })
+})
+
+// 获取关注列表接口  从数据库中查询 实现数据的双向更新
+
+router.get('/api/focus',auth,async (req , res) => {
+    let focus = req.user.focus
+    let focusArr = []
+    for(let i = 0; i<focus.length; i++){
+        // 获取到关注人的id
+        let id = focus[i]._id
+        let focusUser = await User.findById(id)
+        let userInfo = {}
+        userInfo.avatar = focusUser.avatar
+        userInfo.nickName = focusUser.nickName
+        userInfo.qianming = focusUser.qianming
+        userInfo._id = focusUser._id
+        focusArr.unshift(userInfo)
+    }
+    res.json({
+        user:focusArr
+    })
+})
+// 文章收藏列表接口
+router.get('/api/collecting', auth, async (req , res) => {
+    let collecting = req.user.collecting
+    let collectingArr = []
+    for(let i = 0; i<collecting.length; i++){
+        // 获取文章id
+        let id = collecting[i].articleid
+        let collectingArticle = await Article.findById(id)
+        let articleInfo = {}
+        articleInfo.title = collectingArticle.blogTitle
+        articleInfo.content = collectingArticle.content
+        articleInfo._id = collectingArticle._id
+        collectingArr.unshift(articleInfo)
+    }
+    res.json({
+        collecting:collectingArr
+    })
+})
+
+// 获取粉丝列表
+
+router.get('/api/likeme', auth, async ( req, res) => {
+    let likeme = req.user.likeme
+    console.log(likeme.length)
+    let likemeArr = []
+    for(let i = 0; i<likeme.length; i++){
+        // 获取到粉丝的id
+        let id = likeme[i]._id
+        let likemeUser = await User.findById(id)
+        let userInfo = {}
+        userInfo.avatar = likemeUser.avatar
+        userInfo.nickName = likemeUser.nickName
+        userInfo.qianming = likemeUser.qianming
+        userInfo._id = likemeUser._id
+        likemeArr.unshift(userInfo)
+    }
+    res.json({
+        user:likemeArr
     })
 })
 

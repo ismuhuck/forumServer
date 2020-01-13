@@ -6,39 +6,17 @@ const auth = require('./auth')
 
 var router = express.Router()
 
-// 时间格式化函数
-function dateFormat(fmt, date) {
-    let ret;
-    const opt = {
-        "Y+": date.getFullYear().toString(),        // 年
-        "m+": (date.getMonth() + 1).toString(),     // 月
-        "d+": date.getDate().toString(),            // 日
-        "H+": date.getHours().toString(),           // 时
-        "M+": date.getMinutes().toString(),         // 分
-        "S+": date.getSeconds().toString()          // 秒
-        // 有其他格式化字符需求可以继续添加，必须转化成字符串
-    };
-    for (let k in opt) {
-        ret = new RegExp("(" + k + ")").exec(fmt);
-        if (ret) {
-            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
-        };
-    };
-    return fmt;
-}
 
 //  code 0: 成功 1：失败 2:点赞成功 3：取消点赞 4: 未发表任何文章
 router.post('/api/createArticle',auth,async (req,res) =>{
     let date = new Date()
-    let time=dateFormat("YYYY-mm-dd HH:MM:SS", date)
-    console.log(time)
+    // 将标准时间转化为时间戳，用于读取数据库时的排序问题
+    let time=date.getTime()
     let article =await Article.create(
         {
             blogTitle:req.body.blogTitle,
             content:req.body.content,
             userId:req.user._id,
-            userAva:req.user.avatar,
-            userNickname:req.user.nickName,
             createTime:time,
         }
     )
@@ -98,33 +76,41 @@ router.get('/api/thisArticle',async (req , res) => {
 
 // 文章点赞
 router.post('/api/like',auth, async (req,res) =>{
+    // 文章发表用户ID
     let articleId = req.body.articleId
+    // 当前登陆者的ID
     let userId = req.user._id
     let article = await Article.findById(articleId)
     let likeArr = article.like
+    console.log(likeArr)
+    console.log(typeof(likeArr[0]))
     let flag = likeArr.some((item,i) => {
-        return item.userId.toString() === userId.toString()
+        return item.toString() === userId.toString()
     })
     if(!flag){
-        let like = article.like
-        let likeObj = {
-            avatar:req.user.avatar,
-            userId:userId
-        }
-        like.push(likeObj)
+        likeArr.unshift(userId)
         await Article.update({_id:articleId},{
             $set:{
-                like:like
+                like:likeArr
             }
         })
         let newArticle = await Article.findById(articleId)
+        let likeUser = newArticle.like
+        let avatarArr =[]
+        for(let i = 0; i<likeUser.length; i++){
+            // 获取当前所有点赞者的id
+            let id = likeUser[i]
+            let user = await User.findById(id)
+            let avatar = user.avatar
+            avatarArr.unshift(avatar)
+        }
         return res.status(200).json({
             code:2,
-            articleInfo:newArticle
+            articleInfo:avatarArr
         })
     }
         for(let i=0;i<likeArr.length;i++){
-        let {userId:userid} = likeArr[i]
+        let userid = likeArr[i]
         if(userid.toString() === userId.toString()){
             likeArr.splice(i,1)
             await Article.update({_id:articleId},{
@@ -149,8 +135,6 @@ router.post('/api/commentText',auth,async (req,res) => {
     let commentObj ={
         comment:body.comment,
         userId:req.user._id,
-        nickName:req.user.nickName,
-        avatar:req.user.avatar
     }
     let comment = article.comment
     comment.push(commentObj)

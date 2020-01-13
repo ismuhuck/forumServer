@@ -52,7 +52,8 @@ router.post('/api/info',auth,async (req,res) => {
         address:body.address,
         company:body.company,
         qq:body.qq,
-        qianming:body.qianming
+        qianming:body.qianming,
+        sex:body.sex
     }})
     if(!user){
         return res.status(200).json({

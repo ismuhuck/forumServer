@@ -37,6 +37,7 @@ var userSchema = new Schema({
     qianming:{
         type:String
     },
+    sex:String,
     startTime:{
         type:Date,
         default:Date.now

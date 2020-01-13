@@ -15,9 +15,9 @@ var articleSchema = new Schema({
         type:String
     },
     userId:Object,
-    userAva:String,
-    userNickname:String,
+    // 点赞
     like:[],
+    // 评论
     comment:[],
     // 0 为没有删除  1 为删除
     isDel:{
@@ -26,4 +26,4 @@ var articleSchema = new Schema({
     }
 })
 
-module.exports = mongoose.model('articel',articleSchema)
+module.exports = mongoose.model('article',articleSchema)
