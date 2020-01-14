@@ -18,6 +18,8 @@ router.get('/api/default',async (req,res) =>{
         articleInfo.title = article.blogTitle
         articleInfo.createTime = article.createTime
         articleInfo._id = article._id
+        articleInfo.userId = userId
+        // console.log(typeof(articleInfo.userId))
         articleArr.push(articleInfo)
     } 
     res.json(

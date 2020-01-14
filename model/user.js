@@ -43,7 +43,7 @@ var userSchema = new Schema({
         default:Date.now
     },
     likeme:[],
-    // 数组中包含对象 对象内容为 关注人昵称 头像 id
+    // 数组
     focus:[],
     collecting:[],//收藏文章
     lastTime:{

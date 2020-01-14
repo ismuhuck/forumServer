@@ -1,6 +1,7 @@
 //用户登录注册路由
 var express = require('express')
 var User = require('../model/user')
+var Article = require('../model/article')
 var bcrypt = require('bcryptjs')
 var jwt = require('jsonwebtoken')
 const auth = require('./auth')
@@ -83,7 +84,19 @@ router.post('/api/login',async (req,res) => {
         code:0
     })
 })
-router.get('/api/getUser',auth,(req,res)=>{
-    return res.json(req.user)
+router.get('/api/getUser',auth,async (req,res)=>{
+    let collecting = req.user.collecting
+    let collectingArr =[]
+    for(let i = 0; i<collecting.length; i++){
+        // 获取所有收藏的文章id
+        let id = collecting[i].articleid
+        let article =await Article.findOne({isDel:'0',_id:id})
+        if(!article) continue;
+        collectingArr.push(id)
+    }
+    return res.json({
+        user:req.user,
+        collecting:collectingArr
+    })
 })
 module.exports = router

@@ -3,11 +3,11 @@ var express = require('express')
 var User = require('../model/user')
 var Article = require('../model/article')
 const auth = require('./auth')
-
 var router = express.Router()
+// 由于mongodb中的_id为对象格式，数据传递时转化为了json格式， 通过参数从前端传递过来的id也为字符串类型  所以要通过ObjectId进行转换
+var ObjectId = require('mongodb').ObjectId
 
-
-//  code 0: 成功 1：失败 2:点赞成功 3：取消点赞 4: 未发表任何文章
+//  code 0: 成功 1：失败 2:点赞成功 3：取消点赞 4: 未发表任何文章 5：进入坛主的主页
 router.post('/api/createArticle', auth, async (req, res) => {
     let date = new Date()
     // 将标准时间转化为时间戳，用于读取数据库时的排序问题
@@ -32,7 +32,7 @@ router.post('/api/createArticle', auth, async (req, res) => {
     })
 })
 // 不使用async异步函数的写法
-//  个人主页获取个人全部文章接口
+// 个人主页获取个人全部文章接口
 router.get('/api/getArticle', auth, (req, res) => {
     let id = req.user._id
     Article.find({ userId: id, isDel: '0' }, (err, docs) => {
@@ -42,22 +42,36 @@ router.get('/api/getArticle', auth, (req, res) => {
     })
     //  return res.json(allArticle)
 })
-// 获取当前坛主的粉丝数关注数，与文章详情分离
 
+// 获取当前坛主的粉丝数关注数，与文章详情分离
 router.get('/api/tanzhu', async (req, res) => {
-    let article = await Article.findById(req.query.articleId)
-    let user = await User.findById(article.userId)
-    let allArticle = await Article.find({ userId: article.userId, isDel: '0' })
+    let user = await User.findById(req.query.userId)
+    let allArticle = await Article.find({ userId:ObjectId(req.query.userId) , isDel: '0' })
     if (!allArticle) {
         return res.status(200).json({
             code: 4,
             msg: '没有查询到文章信息'
         })
     }
+    let collecting = user.collecting
+    // 当用户删除一篇其他用户收藏的文章时，其他用户的收藏数减1
+    let collectingArr =[]
+    for(let i = 0; i<collecting.length; i++){
+        // 获取所有收藏的文章id
+        let id = collecting[i].articleid
+        let article =await Article.findOne({isDel:'0',_id:id})
+        if(!article) continue;
+        collectingArr.push(id)
+    }
+    let tanzhu ={
+        focusNum:user.focus.length,
+        collectingNum:collectingArr.length,
+        likemeNum:user.likeme.length,
+        allarticlesNum:allArticle.length
+    }
     res.status(200).json({
         code: 0,
-        user: user,
-        allArticle: allArticle
+        tanzhu:tanzhu 
     })
 })
 
@@ -65,12 +79,62 @@ router.get('/api/tanzhu', async (req, res) => {
 // 进入文章详情页面
 router.get('/api/thisArticle', async (req, res) => {
     let article = await Article.findById(req.query.articleId)
-    let user = await User.findById(article.userId)
-    let allArticle = await Article.find({ userId: article.userId })
+    let userID = ObjectId(req.query.userId)
+    // 文章主 个人信息
+    let user = await User.findById(userID)
+    // 返回到前端的文章主信息
+    let userInfo = {
+        avatar:user.avatar,
+        nickName:user.nickName,
+        qianming:user.qianming,
+        _id:user._id
+    }
+    if(!article){
+        return res.status(200).json({
+            user:userInfo,
+            code:5
+        })
+    }
+    // 获取评论列表及评论相关人信息
+    let commentArr = article.comment
+    let comment = []
+    for(let i=0; i<commentArr.length; i++){
+        let id = commentArr[i].userId
+        let user = await User.findById(id)
+        let userInfo = {}
+        userInfo.avatar = user.avatar
+        userInfo.nickName = user.nickName
+        userInfo.comment = commentArr[i].comment
+        comment.push(userInfo)
+    }
+    
+    // 文章标题和文章内容
+    let articleInfo = {
+        title:article.blogTitle,
+        content:article.content
+    }
     res.status(200).json({
-        article: article,
-        user: user,
+        article: articleInfo,
+        user: userInfo,
         code: 0,
+        comment:comment
+    })
+})
+
+// 获取点赞列表
+
+router.get('/api/likeList',auth, async (req,res) => {
+    let article = await Article.findById(req.query.articleId)
+    let likeArr = article.like
+    let like = []
+    for(let i =0; i < likeArr.length; i++){
+        let id = likeArr[i]
+        let user = await User.findById(id)
+        let avatar = user.avatar
+        like.push(avatar)
+    }
+    res.json({
+        like:like
     })
 })
 
@@ -82,8 +146,6 @@ router.post('/api/like', auth, async (req, res) => {
     let userId = req.user._id
     let article = await Article.findById(articleId)
     let likeArr = article.like
-    console.log(likeArr)
-    // console.log(typeof(likeArr[0]))
     let flag = likeArr.some((item, i) => {
         return item.toString() === userId.toString()
     })
