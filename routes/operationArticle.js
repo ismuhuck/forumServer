@@ -140,20 +140,32 @@ router.get('/api/likeList',auth, async (req,res) => {
 
 // 文章点赞
 router.post('/api/like', auth, async (req, res) => {
-    // 文章发表用户ID
-    let articleId = req.body.articleId
+    // 文章ID
+    let articleId =ObjectId(req.body.articleId) 
     // 当前登陆者的ID
     let userId = req.user._id
     let article = await Article.findById(articleId)
+    let thisUser = await User.findById(userId)
+    let likeArticle = thisUser.likeArticle
     let likeArr = article.like
     let flag = likeArr.some((item, i) => {
         return item.toString() === userId.toString()
     })
     if (!flag) {
         likeArr.unshift(userId)
+        let thislikeArticle ={
+            articleId:articleId,
+            likeArticleTime:new Date().getTime()
+        }
+        likeArticle.unshift(thislikeArticle)
         await Article.updateOne({ _id: articleId }, {
             $set: {
                 like: likeArr
+            }
+        })
+        await User.updateOne({_id:userId},{
+            $set:{
+                likeArticle:likeArticle
             }
         })
         let newArticle = await Article.findById(articleId)
@@ -170,6 +182,17 @@ router.post('/api/like', auth, async (req, res) => {
             code: 2,
             articleInfo: avatarArr
         })
+    }
+    for (let i=0; i<likeArticle.length;i++){
+        let articleid = likeArticle[i].articleId
+        if(articleid.toString()===articleId.toString()){
+            likeArticle.splice(i,1)
+            await User.updateOne({_id:userId},{
+                $set:{
+                    likeArticle:likeArticle
+                }
+            })
+        }
     }
     for (let i = 0; i < likeArr.length; i++) {
         let userid = likeArr[i]
@@ -231,7 +254,8 @@ router.post('/api/shoucang', auth, async (req, res) => {
         let collecting = req.user.collecting
         let likeObj = {
             title: article.blogTitle,
-            articleid: articleId
+            articleid: articleId,
+            likeTime:new Date().getTime()
         }
         collecting.push(likeObj)
         await User.update({ _id: userId }, {

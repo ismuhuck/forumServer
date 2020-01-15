@@ -42,10 +42,10 @@ var userSchema = new Schema({
         type:Date,
         default:Date.now
     },
-    likeme:[],
-    // 数组
-    focus:[],
-    collecting:[],//收藏文章
+    likeme:[],// 粉丝
+    focus:[],// 关注
+    collecting:[],// 收藏文章
+    likeArticle:[], // 我赞过的文章
     lastTime:{
         type:Date,
         default:Date.now

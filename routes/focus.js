@@ -7,6 +7,9 @@ const express = require('express')
 var ObjectId = require('mongodb').ObjectId
 var router = express.Router()
 
+//code：1 不可关注自己 2 关注成功、粉丝加一 3 取消关注 粉丝减一 8 已关注 9 未关注  10 已收藏 11 未收藏 12 暂时没有点赞的文章
+// 13 您还没有关注的人 14 您还没有粉丝 15 您还没有收藏的文章
+
 // 关注接口
 router.post('/api/focus',auth,async (req,res) => {
     let user = req.user
@@ -14,13 +17,6 @@ router.post('/api/focus',auth,async (req,res) => {
     let focusArr = user.focus
     // 博主ID
     let userID =ObjectId(req.body.userId) 
-    // let newUser =await User.findById(userID)
-    // console.log(userID)
-    // console.log(req.body.userId)
-    // console.log(newUser)
-    // let articleid = req.body.articleId
-    // let article =await Article.findById(articleid)
-    // let userName = article.userNickname
     if(userID.toString() === user._id.toString()){
         return res.status(200).json({
             code:1,
@@ -33,6 +29,7 @@ router.post('/api/focus',auth,async (req,res) => {
     if(!flag){
         let focusInfo = {
             _id:userID,
+            focusTime:new Date().getTime()
         }
         focusArr.push(focusInfo)
         await User.updateOne({_id:userId},{$set:{
@@ -41,6 +38,7 @@ router.post('/api/focus',auth,async (req,res) => {
         let newUser = await User.findById(userId)
         return res.status(200).json({
             code:2,
+            msg:'关注成功'
         })
     }
     for(let i = 0; i<focusArr.length; i++){
@@ -55,6 +53,7 @@ router.post('/api/focus',auth,async (req,res) => {
             let newUser = await User.findById(userId)
             return res.status(200).json({
                 code:3,
+                msg:'取消关注'
             })
     }}
 })
@@ -65,47 +64,37 @@ router.post('/api/likeme',auth,async (req,res) => {
     // 当前登录用户 ID
     let userId = user._id
     // 要关注的坛主ID
-    let id = req.body._id
+    let id = ObjectId(req.body._id) 
     let tanzhu = await User.findById(id)
-    // console.log(tanzhu)
-    
     let likemeArr = tanzhu.likeme
-    // console.log(likemeArr[0]._id.toString()===userId.toString())
     let flag = likemeArr.some((item,i) => {
         return item._id.toString() === userId.toString()
     })
     if(!flag){
         let likemeInfo = {
-            nickName:user.nickName,
-            avatar:user.avatar,
-            _id:user._id,
-            qianming:user.qianming
+            _id:userId,
+            likemeTime:new Date().getTime()
         }
         likemeArr.push(likemeInfo)
         await User.updateOne({_id:id},{$set:{
             likeme:likemeArr
         }})
-        let newUser = await User.findById(id)
         return res.status(200).json({
             code:2,
-            user:newUser,
             msg:'粉丝加一'
         })
     }
     for(let i = 0; i<likemeArr.length; i++){
         let {_id:userid} = likemeArr[i]
         if(userid.toString() === userId.toString()){
-            // console.log(userid.toString() === userId.toString())
             likemeArr.splice(i,1)
             await User.updateOne({_id:id},{
                 $set:{
                     likeme:likemeArr
                 }
             })
-            let newUser = await User.findById(id)
             return res.status(200).json({
                 code:3,
-                user:newUser,
                 msg:'粉丝减一'
             })
     }}
@@ -131,13 +120,14 @@ router.get('/api/focus',auth,async (req , res) => {
         userInfo.nickName = focusUser.nickName
         userInfo.qianming = focusUser.qianming
         userInfo._id = focusUser._id
+        userInfo.focusTime = focus[i].focusTime
         focusArr.unshift(userInfo)
     }
     res.json({
         user:focusArr
     })
 })
-// 文章收藏列表接口
+// 获取文章收藏列表接口
 router.get('/api/collecting', auth, async (req , res) => {
     let collecting = req.user.collecting
     let collectingArr = []
@@ -152,6 +142,7 @@ router.get('/api/collecting', auth, async (req , res) => {
         articleInfo.content = collectingArticle.content
         articleInfo._id = collectingArticle._id
         articleInfo.userId = collectingArticle.userId
+        articleInfo.likeTime = collecting[i].likeTime
         collectingArr.unshift(articleInfo)
     }
     res.json({
@@ -163,7 +154,6 @@ router.get('/api/collecting', auth, async (req , res) => {
 
 router.get('/api/likeme', auth, async ( req, res) => {
     let likeme = req.user.likeme
-    console.log(likeme.length)
     let likemeArr = []
     for(let i = 0; i<likeme.length; i++){
         // 获取到粉丝的id
@@ -174,11 +164,135 @@ router.get('/api/likeme', auth, async ( req, res) => {
         userInfo.nickName = likemeUser.nickName
         userInfo.qianming = likemeUser.qianming
         userInfo._id = likemeUser._id
+        userInfo.likemeTime = likeme[i].likemeTime
         likemeArr.unshift(userInfo)
     }
     res.json({
         user:likemeArr
     })
 })
+
+// 获取点赞的文章列表
+
+router.get('/api/likeArticle',auth, async (req , res) => {
+    let likeArticle = req.user.likeArticle
+    let likeArr = []
+    for(let i=0;i<likeArticle.length;i++){
+        let id = likeArticle[i].articleId
+        let article = await Article.findOne({_id:id,isDel:'0'})
+        if(!article) continue;
+        let articleInfo = {
+            title:article.blogTitle,
+            content:article.content,
+            _id:article._id,
+            userId:article.userId,
+            likeArticleTime:likeArticle[i].likeArticleTime
+        }
+        likeArr.push(articleInfo)
+    }
+    // console.log(typeof(likeArr.length))
+    if(likeArr.length===0){
+        return res.status(200).json({
+            code:12
+        })
+    }
+    return res.status(200).json({
+        code:0,
+        likeArticle:likeArr
+    })
+})
+
+// 关注人的文章列表
+
+router.get('/api/focusArticles',auth,async (req, res) => {
+    let userId = ObjectId(req.query.userId)
+    let allArticles = await Article.find({userId:userId,isDel:'0'})
+    let allArticlesArr = []
+    for(let i = 0;i<allArticles.length;i++){
+        let articles = allArticles[i]
+        let articlesObj ={
+            title:articles.blogTitle,
+            content:articles.content,
+            createTime :articles.createTime,
+            userId:articles.userId,
+            _id:articles._id
+        }
+        allArticlesArr.unshift(articlesObj)
+    }
+    res.json({
+        code:0,
+        articles:allArticlesArr
+    })
+})
+
+// 获取关注状态
+
+router.get('/api/facusStatus',auth, async (req, res) => {
+    let id = req.user._id  // 当前登录者的id
+    let userId =ObjectId(req.query.userId)  // 坛主的id
+    let user = await User.findById(id)
+    let focusArr = user.focus
+    let flag = focusArr.some((item,index) => {
+        return item._id.toString() === userId.toString()
+    }) 
+    if(flag){
+        return res.status(200).json({
+            code:8,
+            msg:'已关注'
+        })
+    }
+    else{
+        return res.status(200).json({
+            code:9,
+            msg:'未关注'
+        })
+    }
+})
+
+// 获取收藏状态
+
+router.get('/api/collectingStatus', auth, async (req, res) => {
+    let id = req.user._id  // 当前登录者的id
+    let articleId =ObjectId(req.query.articleId)  // 文章的id
+    let user = await User.findById(id)
+    let collectingArr = user.collecting
+    let flag = collectingArr.some((item,index) => {
+        return item.articleid.toString() === articleId.toString()
+    })
+    if(flag){
+        return res.status(200).json({
+            code:10,
+            msg:'已收藏'
+        })
+    }
+    else{
+        return res.status(200).json({
+            code:11,
+            msg:'取消收藏'
+        })
+    }
+})
+
+// 获取点赞状态
+ router.get('/api/likeStatus', auth, async ( req, res) =>{
+     let id = req.user._id
+     let articleId = ObjectId(req.query.articleId)
+     let likeArr = req.user.likeArticle
+     let flag = likeArr.some((item,index) => {
+         return item.articleId.toString() === articleId.toString()
+     })
+     if(flag){
+         return res.status(200).json({
+             code:12,
+             msg:'已点赞'
+         })
+     }
+     else{
+         return res.status(200).json({
+             code:13,
+             msg:'取消点赞'
+         })
+     }
+ })
 
 module.exports = router
