@@ -1,7 +1,8 @@
-//  发表文章接口
+//  文章操作接口
 var express = require('express')
 var User = require('../model/user')
 var Article = require('../model/article')
+var Comment = require('../model/comment')
 const auth = require('./auth')
 var router = express.Router()
 // 由于mongodb中的_id为对象格式，数据传递时转化为了json格式， 通过参数从前端传递过来的id也为字符串类型  所以要通过ObjectId进行转换
@@ -18,6 +19,12 @@ router.post('/api/createArticle', auth, async (req, res) => {
             content: req.body.content,
             userId: req.user._id,
             createTime: time,
+        }
+    )
+    let comment = await Comment.create(
+        {
+            masterID:article.userId,
+            articleId:article._id,
         }
     )
     if (!article) {
@@ -105,6 +112,25 @@ router.get('/api/thisArticle', async (req, res) => {
         userInfo.avatar = user.avatar
         userInfo.nickName = user.nickName
         userInfo.comment = commentArr[i].comment
+        userInfo.commentTime = commentArr[i].commentTime
+        userInfo.commentID = commentArr[i].commentID
+        let reply = commentArr[i].reply
+        let replyList =[]
+        for(let j=0;j<reply.length;j++){
+            let user_id = reply[j].userID //回复人ID
+            let comment_id = reply[j].commentuserID//被回复人Id
+            let user__id = await User.findById(user_id)
+            let comment__id = await User.findById(comment_id)
+            let obj ={
+                userNickname:user__id.nickName,
+                commentNickname:comment__id.nickName,
+                content:reply[j].replycontent,
+                replyTime:reply[j].replyTime,
+                commentID:reply[j].commentID
+            }
+            replyList.push(obj)
+        }
+        userInfo.reply=replyList
         comment.push(userInfo)
     }
     
@@ -222,25 +248,7 @@ router.post('/api/like', auth, async (req, res) => {
     }
 })
 
-// 文章评论
-router.post('/api/commentText', auth, async (req, res) => {
-    let body = req.body
-    let article = await Article.findById(body.articleId)
-    let commentObj = {
-        comment: body.comment,
-        userId: req.user._id,
-    }
-    let comment = article.comment
-    comment.push(commentObj)
-    await Article.update({ _id: body.articleId }, {
-        $set: {
-            comment: comment
-        }
-    })
-    res.status(200).json({
-        code: 0
-    })
-})
+
 // 文章收藏
 router.post('/api/shoucang', auth, async (req, res) => {
     let articleId = req.body.articleId
