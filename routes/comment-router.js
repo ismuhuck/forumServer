@@ -58,6 +58,40 @@ router.post('/api/commentson',auth,async (req,res) => {
     })
 })
 
+// 文章子评论回复
+router.post('/api/commentsun',auth,async(req,res) =>{
+    let body = req.body
+    let articleId = ObjectId(body.articleId)
+    let userID = req.user._id //当前登陆者的id 
+    let article = await Article.findById(articleId)
+    let commentList = article.comment
+    for(let i=0;i<commentList.length;i++){
+        let reply = commentList[i].reply
+        let commentObj = {}
+        for(let j=0;j<reply.length;j++){
+            if(reply[j].commentID === body.commentID){
+                let ID = reply[j].userID // 子评论被回复人ID
+                let id = userID //回复人ID
+                commentObj.commentuserID = ID
+                commentObj.userID = id
+                commentObj.replycontent=body.replycontent
+                commentObj.replyTime = new Date().getTime()
+                commentObj.commentID = new Date().getTime()+userID.toString()
+                break;
+            }
+        }
+        if(commentList[i].commentID === body.zhucommentID){
+            commentList[i].reply.push(commentObj)
+        }
+    }
+    await Article.updateOne({_id:articleId},{$set:{
+        comment:commentList
+    }})
+    res.status(200).json({
+        code:0,
+        msg:'回复成功'
+    })
+})
 // router.post('/api/commentText', auth, async (req, res) => {
 //     let body = req.body
 //     let ID = ObjectId(body.articleId)//当前文章id

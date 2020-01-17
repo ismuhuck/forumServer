@@ -191,11 +191,11 @@ router.get('/api/likeArticle',auth, async (req , res) => {
         likeArr.push(articleInfo)
     }
     // console.log(typeof(likeArr.length))
-    if(likeArr.length===0){
-        return res.status(200).json({
-            code:12
-        })
-    }
+    // if(likeArr.length===0){
+    //     return res.status(200).json({
+    //         code:12
+    //     })
+    // }
     return res.status(200).json({
         code:0,
         likeArticle:likeArr

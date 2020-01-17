@@ -119,6 +119,7 @@ router.get('/api/thisArticle', async (req, res) => {
         for(let j=0;j<reply.length;j++){
             let user_id = reply[j].userID //回复人ID
             let comment_id = reply[j].commentuserID//被回复人Id
+            // console.log(comment_id)
             let user__id = await User.findById(user_id)
             let comment__id = await User.findById(comment_id)
             let obj ={
