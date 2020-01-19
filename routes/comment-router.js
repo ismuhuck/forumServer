@@ -1,10 +1,9 @@
 var express = require('express')
-var Comment = require('../model/comment')
 var User = require('../model/user')
 var Article = require('../model/article')
 var auth = require('./auth')
 let router = express.Router()
-var ObjectId = require('mongodb').ObjectId
+var ObjectId = require('mongodb').ObjectId 
 
 // 文章评论
 router.post('/api/commentText', auth, async (req, res) => {
@@ -92,15 +91,5 @@ router.post('/api/commentsun',auth,async(req,res) =>{
         msg:'回复成功'
     })
 })
-// router.post('/api/commentText', auth, async (req, res) => {
-//     let body = req.body
-//     let ID = ObjectId(body.articleId)//当前文章id
-//     let comment =await Comment.findOne({articleId:ID})
-//     let commentList = comment.commentbody
-//     let commentObj = {
-//         content:body.comment,
-//         commentID:new Date().getTime()
-//     }
-// })
 
 module.exports = router

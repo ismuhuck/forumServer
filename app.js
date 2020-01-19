@@ -11,6 +11,7 @@ var commentRouter = require('./routes/comment-router')
 var session = require('express-session')//session 默认为一个对象  添加到req请求头中
 
 var app = express()
+var expressWs = require('express-ws')(app)
 app.use(session({
   secret: 'keyboard cat',//配置加密字符串  会在原有加密基础之上和该字符串拼接起来加密
   resave: false,

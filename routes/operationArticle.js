@@ -2,7 +2,6 @@
 var express = require('express')
 var User = require('../model/user')
 var Article = require('../model/article')
-var Comment = require('../model/comment')
 const auth = require('./auth')
 var router = express.Router()
 // 由于mongodb中的_id为对象格式，数据传递时转化为了json格式， 通过参数从前端传递过来的id也为字符串类型  所以要通过ObjectId进行转换
@@ -150,7 +149,7 @@ router.get('/api/thisArticle', async (req, res) => {
 
 // 获取点赞列表
 
-router.get('/api/likeList',auth, async (req,res) => {
+router.get('/api/likeList', async (req,res) => {
     let article = await Article.findById(req.query.articleId)
     let likeArr = article.like
     let like = []
@@ -310,5 +309,13 @@ router.post('/api/deleted', auth, async (req, res) => {
         msg: '删除成功'
     })
 
+})
+
+// 文章搜索
+router.post('/api/search',async (req, res) => {
+    console.log(req.body)
+    res.json({
+        msg:'调用成功'
+    })
 })
 module.exports = router
