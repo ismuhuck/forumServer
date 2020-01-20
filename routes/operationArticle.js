@@ -20,12 +20,6 @@ router.post('/api/createArticle', auth, async (req, res) => {
             createTime: time,
         }
     )
-    let comment = await Comment.create(
-        {
-            masterID:article.userId,
-            articleId:article._id,
-        }
-    )
     if (!article) {
         return res.json({
             code: 1,
@@ -313,9 +307,15 @@ router.post('/api/deleted', auth, async (req, res) => {
 
 // 文章搜索
 router.post('/api/search',async (req, res) => {
-    console.log(req.body)
+    const searchdata = req.body.searchtext
+    const reg = new RegExp(searchdata,'i')
+    // 多条件查询  如果文章的题目和内容有匹配到reg则该条记录被返回，并且只返回该条记录 题目、内容、拥有该篇文章的用户的用户id，记录的_id默认返回
+    let articles =await Article.find({$or:[{blogTitle:{$regex:reg}},{content:{$regex:reg}}],isDel:'0'},{blogTitle:1,content:1,userId:1,createTime:1} )
+    let user =await User.find({nickName:{$regex:reg}},{nickName:1,avatar:1,qianming:1})
     res.json({
-        msg:'调用成功'
+        msg:'调用成功',
+        article:articles,
+        user:user
     })
 })
 module.exports = router
