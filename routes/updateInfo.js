@@ -5,7 +5,6 @@ var Article = require('../model/article')
 var auth = require('./auth')
 var bcrypt = require('bcryptjs')
 var multer = require('multer')
-// var upload = multer({ dest: 'uploads/' })
 let router = express.Router()
 
 var storage = multer.diskStorage({

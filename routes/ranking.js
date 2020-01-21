@@ -30,27 +30,40 @@ router.get('/api/default',async (req,res) =>{
     )
 })
 
-
-router.get('/api/week',async (req,res) =>{
-    let allArticle = await Article.find({isDel:"0"})
-    res.json({
-        article:allArticle,
-        code:0
-    })
+router.get('/api/week',(req,res) =>{
+    ranking(req,res,604800000)
 })
 router.get('/api/mouth',async (req,res) =>{
-    let allArticle = await Article.find({isDel:"0"})
-    res.json({
-        article:allArticle,
-        code:0
-    })
+    ranking(req,res,2592000000)
 })
 router.get('/api/year',async (req,res) =>{
-    let allArticle = await Article.find({isDel:"0"})
-    res.json({
-        article:allArticle,
-        code:0
-    })
+    ranking(req,res,31536000000)
 })
 
+// 排行函数
+async function ranking(req,res,updateTime){
+    let time = req.query.time
+    let pretime = time-updateTime
+    // createTime:{$gt:pretime,$lt:time} 查询到的数据按点赞数量倒序排列，并且最多只返回20条数据
+    let allArticle = await Article.find({isDel:"0",createTime:{$gt:pretime,$lt:time}}).sort({likeNum:-1}).limit(20)
+    let articleArr = []
+    for(let i=0;i<allArticle.length;i++){
+        let userId  = allArticle[i].userId
+        let user = await User.findById(userId)
+        let article = allArticle[i]
+        let articleInfo ={
+            avatar:user.avatar,
+            nickName:user.nickName,
+            createTime:article.createTime,
+            title:article.blogTitle,
+            _id : article._id,
+            userId : userId
+        }
+        articleArr.push(articleInfo)
+    }
+    res.json({
+        article:articleArr,
+        code:0
+    })
+}
 module.exports = router

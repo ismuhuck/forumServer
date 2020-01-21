@@ -6,6 +6,39 @@ const auth = require('./auth')
 var router = express.Router()
 // 由于mongodb中的_id为对象格式，数据传递时转化为了json格式， 通过参数从前端传递过来的id也为字符串类型  所以要通过ObjectId进行转换
 var ObjectId = require('mongodb').ObjectId
+var multer = require('multer')
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // 接收到文件后输出的保存路径（若不存在则需要创建）
+        cb(null, 'uploads/');    
+    },
+    filename: function (req, file, cb) {
+        // 将保存文件名设置为 时间戳 + 文件原始名，比如 151342376785-123.jpg
+        cb(null, Date.now() + "-" + file.originalname);  
+    }
+});
+var upload = multer({ storage: storage})
+router.post('/api/uploadImg',auth,upload.array('photos',10),async (req,res)=>{
+    //循环处理
+    var imgPath=[];
+    req.files.forEach(function (i) {
+        //获取临时文件的存储路径
+        imgPath.push(i.path);
+        console.log("i.path:",i.path)
+    });
+
+    //所有文件上传成功
+    //回复信息
+    var reponse = {
+        message: 'File uploaded successfully',
+        imgPath
+    };
+    //返回
+    res.json(reponse);
+})
+
+
 
 //  code 0: 成功 1：失败 2:点赞成功 3：取消点赞 4: 未发表任何文章 5：进入坛主的主页
 router.post('/api/createArticle', auth, async (req, res) => {
@@ -177,10 +210,12 @@ router.post('/api/like', auth, async (req, res) => {
             articleId:articleId,
             likeArticleTime:new Date().getTime()
         }
+        let num = likeArr.length
         likeArticle.unshift(thislikeArticle)
         await Article.updateOne({ _id: articleId }, {
             $set: {
-                like: likeArr
+                like: likeArr,
+                likeNum: num
             }
         })
         await User.updateOne({_id:userId},{
@@ -218,9 +253,11 @@ router.post('/api/like', auth, async (req, res) => {
         let userid = likeArr[i]
         if (userid.toString() === userId.toString()) {
             likeArr.splice(i, 1)
+            let num = likeArr.length
             await Article.update({ _id: articleId }, {
                 $set: {
-                    like: likeArr
+                    like: likeArr,
+                    likeNum:num
                 }
             })
             let newArticle = await Article.findById(articleId)
@@ -310,12 +347,46 @@ router.post('/api/search',async (req, res) => {
     const searchdata = req.body.searchtext
     const reg = new RegExp(searchdata,'i')
     // 多条件查询  如果文章的题目和内容有匹配到reg则该条记录被返回，并且只返回该条记录 题目、内容、拥有该篇文章的用户的用户id，记录的_id默认返回
-    let articles =await Article.find({$or:[{blogTitle:{$regex:reg}},{content:{$regex:reg}}],isDel:'0'},{blogTitle:1,content:1,userId:1,createTime:1} )
-    let user =await User.find({nickName:{$regex:reg}},{nickName:1,avatar:1,qianming:1})
+    let articles =await Article.find({$or:[{blogTitle:{$regex:reg}},{content:{$regex:reg}}],isDel:'0'},{blogTitle:1,content:1,userId:1,createTime:1,like:1,comment:1} )
+    let users =await User.find({nickName:{$regex:reg}},{nickName:1,avatar:1,qianming:1,likeme:1})
+    // let articleNum = await Article.find
+    // 返回给前端的数据
+    // 综合
+    let articleArr =[]
+    let userArr = []
+    for(let i=0;i<articles.length ;i++){
+        let article = articles[i]
+        let user = await User.findById(article.userId)
+        let articlesObj= {
+            blogTitle : article.blogTitle,
+            content : article.content,
+            createTime : article.createTime,
+            likeNum : article.like.length,
+            commentNum : article.comment.length,
+            _id:article._id,
+            userId:article.userId,
+            avatar:user.avatar
+        }
+        articleArr.push(articlesObj)
+    }
+    for(let i=0;i<users.length;i++){
+        let user = users[i]
+        let _id = user._id
+        let userarticles = await Article.find({userId:_id,isDel:'0'}).count()
+        // let articlesNum = userarticles.length
+        let userObj ={
+            nickName : user.nickName,
+            avatar : user.avatar,
+            likemeNum : user.likeme.length,
+            articleNum : userarticles,
+            _id:user._id
+        }
+        userArr.push(userObj)
+    }
     res.json({
         msg:'调用成功',
-        article:articles,
-        user:user
+        article:articleArr,
+        user:userArr
     })
 })
 module.exports = router

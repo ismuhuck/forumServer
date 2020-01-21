@@ -18,8 +18,8 @@
 //     likeArr.push({"userId":"44444"})
 // }
 // console.log(likeArr)
-var date = new Date()
-console.log(date)
-var t1="2017/08/28 04:56:38"; //数据
-var dateBegin = new Date(t1);
-console.log(dateBegin)
+// var date = new Date()
+// console.log(date)
+// var t1="2017/08/28 04:56:38"; //数据
+// var dateBegin = new Date(t1);
+// console.log(dateBegin)

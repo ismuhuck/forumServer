@@ -23,7 +23,9 @@ var articleSchema = new Schema({
     isDel:{
         type:String,
         default:"0"
-    }
+    },
+    // 点赞数量，用于排序
+    likeNum:Number
 })
 
 module.exports = mongoose.model('article',articleSchema)
