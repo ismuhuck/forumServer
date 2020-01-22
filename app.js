@@ -19,7 +19,7 @@ app.use(session({
   cookie: { secure: true }
 }))
 app.use(express.static(path.join(__dirname, './public/')))
-app.use(express.static(path.join(__dirname, './uploads/')))
+app.use(express.static('./uploads/'))
 app.use(express.static(path.join(__dirname, './node_modules/')))
 app.use(cors())//设置跨域
 app.use(express.json())

@@ -2,40 +2,49 @@
 var express = require('express')
 var User = require('../model/user')
 var Article = require('../model/article')
+var UploadImg = require('../model/uploadImg') 
 const auth = require('./auth')
 var router = express.Router()
 // 由于mongodb中的_id为对象格式，数据传递时转化为了json格式， 通过参数从前端传递过来的id也为字符串类型  所以要通过ObjectId进行转换
 var ObjectId = require('mongodb').ObjectId
 var multer = require('multer')
+const fs = require('fs') //图片路径
 
+const {createFolder, isPresenceFile} = require('../util/util')
+// uploads 文件夹与app.js使用的静态文件夹路径(相对于app.js的路径)一致
+let uploadFolder  = './uploads/tinymce'
+createFolder(uploadFolder)
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // 接收到文件后输出的保存路径（若不存在则需要创建）
-        cb(null, 'uploads/');    
+        cb(null, uploadFolder);   
     },
     filename: function (req, file, cb) {
         // 将保存文件名设置为 时间戳 + 文件原始名，比如 151342376785-123.jpg
-        cb(null, Date.now() + "-" + file.originalname);  
+        // console.log("ssssss",file)
+        cb(null, `tinymce_${file.fieldname}_${Date.now()}.${file.originalname.split('.')[1]}`);  
     }
 });
+// 通过storage选项来对上传行为进行定制化
 var upload = multer({ storage: storage})
-router.post('/api/uploadImg',auth,upload.array('photos',10),async (req,res)=>{
-    //循环处理
-    var imgPath=[];
-    req.files.forEach(function (i) {
-        //获取临时文件的存储路径
-        imgPath.push(i.path);
-        console.log("i.path:",i.path)
-    });
-
-    //所有文件上传成功
-    //回复信息
-    var reponse = {
-        message: 'File uploaded successfully',
-        imgPath
-    };
-    //返回
-    res.json(reponse);
+// 调用上面定义的upload对象，存储单个图片的函数，file与前端保存的formData对象名一致
+router.post('/api/uploadImg',auth,upload.single('file'),async (req,res)=>{
+    let user = req.user
+    // express 在app.js文件中调用了静态文件函数，所以此处直接写服务器地址+文件对应路径即可
+    let url = `http://localhost:5000/tinymce/${req['file'].filename}`
+    let da = {...req.file}
+    let obj = {
+            "last_modified_user_id":user[0].id,
+            "name":da.filename,
+            "originalname":da.originalname,
+            "priview_url":url,//这是前端需要的路径，浏览器直接访问可以下载，前端将此url加入到img的src属性也可展示，tinymce只需此路径即可展示
+            "encoding":da.encoding,
+            "suffix_name":da.originalname.split('.')[1],
+            "size":da.size
+        }
+        let uploadImg = await UploadImg.create({
+            imgInfo:obj
+        })
 })
 
 
