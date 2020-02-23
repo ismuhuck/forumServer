@@ -40,15 +40,16 @@ var userSchema = new Schema({
     sex:String,
     startTime:{
         type:Date,
-        default:Date.now
+        default:new Date().getTime()
     },
     likeme:[],// 粉丝
     focus:[],// 关注
     collecting:[],// 收藏文章
     likeArticle:[], // 我赞过的文章
-    lastTime:{
-        type:Date,
-        default:Date.now
+    // 状态码 0：无异常 1：禁言 2：黑名单不能浏览文章 3：账号已被注销  4: 账号审核中 5：注册已拒绝
+    statusCode:{
+        type:Number,
+        default:4
     }
 })
 

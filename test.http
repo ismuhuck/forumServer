@@ -34,6 +34,15 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkM
 }
 
 ###
+POST {{url}}/addAdmin
+{{json}}
+
+{
+    "userName":"admin",
+    "password":"123456"
+}
+
+###
 POST {{url}}/updatePass
 authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw
 {{json}}

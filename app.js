@@ -9,6 +9,7 @@ var updateInfoRouter = require('./routes/updateInfo')
 var focusRouter = require('./routes/focus')
 var commentRouter = require('./routes/comment-router')
 var session = require('express-session')//session 默认为一个对象  添加到req请求头中
+var manageRouter = require('./routes/manage.js')
 
 var app = express()
 var expressWs = require('express-ws')(app)
@@ -29,6 +30,7 @@ app.use(rankingRouter) //文章排行路由
 app.use(updateInfoRouter)//修改用户个人信息router
 app.use(focusRouter)//关注及收藏路由
 app.use(commentRouter)//文章评论及回复路由
+app.use(manageRouter) //管理端路由
 
 app.listen(5000, function () {
   console.log("server is running port:5000");

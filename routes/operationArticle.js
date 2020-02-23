@@ -34,7 +34,7 @@ router.post('/api/uploadImg',auth,upload.single('file'),async (req,res)=>{
     let url = `http://localhost:5000/tinymce/${req['file'].filename}`
     let da = {...req.file}
     let obj = {
-            "last_modified_user_id":user[0].id,
+            "last_modified_user_id":user._id,
             "name":da.filename,
             "originalname":da.originalname,
             "priview_url":url,//这是前端需要的路径，浏览器直接访问可以下载，前端将此url加入到img的src属性也可展示，tinymce只需此路径即可展示
@@ -45,6 +45,10 @@ router.post('/api/uploadImg',auth,upload.single('file'),async (req,res)=>{
         let uploadImg = await UploadImg.create({
             imgInfo:obj
         })
+    res.json({
+        uploadImg:uploadImg,
+        status:200
+    })
 })
 
 

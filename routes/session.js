@@ -56,6 +56,12 @@ router.post('/api/register',async (req,res) => {
     
     res.send(user)
 })
+router.get('/api/getStatus',auth, async (req,res) => {
+    res.json({
+        statusCode:req.user.statusCode
+    })
+    // console.log(req.user)
+})
 router.post('/api/login',async (req,res) => {
     const user = await User.findOne({
         email:req.body.email
@@ -64,7 +70,24 @@ router.post('/api/login',async (req,res) => {
         res.status(200).json({
             msg:"用户不存在",
             code:1
-
+        })
+    }
+    if(user.statusCode ===3){
+       return res.status(200).json({
+            code:100,
+            msg:'因用户多次违反发言规则，账号已被注销'
+        })
+    }
+    if(user.statusCode === 4){
+        return res.status(200).json({
+            code:200,
+            msg: '正在审核中，请稍后尝试'
+        })
+    }
+    if(user.statusCode === 5){
+        return res.status(200).json({
+            code:300,
+            msg: '你的注册审核已被拒绝'
         })
     }
     const ispassaword = bcrypt.compareSync(req.body.password,user.password) //验证密码 返回一个布尔值
