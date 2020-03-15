@@ -9,12 +9,28 @@ var ObjectId = require('mongodb').ObjectId
 router.post('/api/commentText', auth, async (req, res) => {
     let body = req.body
     let article = await Article.findById(body.articleId)
+    let firstId = article.userId// 被评论人id
+    let firstUser = await User.findById(firstId)
+    let firstMessge = firstUser.message
+    let messageObj = {
+        articleId:body.articleId,
+        userName:req.user.nickName,
+        title:article.blogTitle,
+        userId:firstId,
+        id:new Date().getTime()+req.user._id.toString()
+    }
+    firstMessge.push(messageObj)
+    await User.update({ _id: firstId}, {
+        $set: {
+            message: firstMessge
+        }
+    })
     let commentObj = {
         comment: body.comment,
         userId: req.user._id,
         commentID:new Date().getTime()+req.user._id.toString(),//评论id为当前时间戳加上当前评论的用户id
         commentTime:new Date().getTime(),
-        reply:[]//子评论列表
+        reply:[],//子评论列表
     }
     let comment = article.comment
     comment.push(commentObj)
@@ -91,5 +107,28 @@ router.post('/api/commentsun',auth,async(req,res) =>{
         msg:'回复成功'
     })
 })
+// 通知消息
+router.get('/api/message',auth, (req,res) =>{
+    let message = req.user.message
+    res.json(message)
+})
 
+router.get('/api/delmessage',auth,async (req,res) => {
+    let id = req.query.id
+    let message = req.user.message
+    for(let i =0;i<message.length;i++){
+        let msg = message[i]
+        if(msg.id === id){
+            message.splice(i,1)
+        }
+    }
+    await User.update({ _id: req.user._id}, {
+        $set: {
+            message: message
+        }
+    })
+    res.json({
+        code:0
+    })
+})
 module.exports = router

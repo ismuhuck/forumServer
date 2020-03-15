@@ -134,7 +134,7 @@ router.get('/api/collecting', auth, async (req , res) => {
     for(let i = 0; i<collecting.length; i++){
         // 获取文章id
         let id = collecting[i].articleid
-        let collectingArticle = await Article.findOne({isDel:"0",_id:id})
+        let collectingArticle = await Article.findOne({isDel:"0",_id:id,statusCode:0})
         // 当collectingArticle为空时跳出本次循环，不为空时继续后面的操作
         if(!collectingArticle) continue;
         let articleInfo = {}
@@ -179,7 +179,7 @@ router.get('/api/likeArticle',auth, async (req , res) => {
     let likeArr = []
     for(let i=0;i<likeArticle.length;i++){
         let id = likeArticle[i].articleId
-        let article = await Article.findOne({_id:id,isDel:'0'})
+        let article = await Article.findOne({_id:id,isDel:'0',statusCode:0})
         if(!article) continue;
         let articleInfo = {
             title:article.blogTitle,
@@ -206,7 +206,7 @@ router.get('/api/likeArticle',auth, async (req , res) => {
 
 router.get('/api/focusArticles',auth,async (req, res) => {
     let userId = ObjectId(req.query.userId)
-    let allArticles = await Article.find({userId:userId,isDel:'0'})
+    let allArticles = await Article.find({userId:userId,isDel:'0',statusCode:0})
     let allArticlesArr = []
     for(let i = 0;i<allArticles.length;i++){
         let articles = allArticles[i]

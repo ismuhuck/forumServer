@@ -6,7 +6,7 @@ var Article = require('../model/article')
 let router = express.Router()
 
 router.get('/api/default',async (req,res) =>{
-    let allArticle = await Article.find({isDel:"0"}).sort({createTime:-1})
+    let allArticle = await Article.find({isDel:"0",statusCode:0}).sort({createTime:-1})
     let articleArr = []
     for(let i = 0; i<allArticle.length; i++){
         let userId  = allArticle[i].userId
@@ -49,7 +49,7 @@ async function ranking(req,res,updateTime){
     let time = req.query.time
     let pretime = time-updateTime
     // createTime:{$gt:pretime,$lt:time} 查询到的数据按点赞数量倒序排列，并且最多只返回20条数据
-    let allArticle = await Article.find({isDel:"0",createTime:{$gt:pretime,$lt:time}}).sort({likeNum:-1}).limit(20)
+    let allArticle = await Article.find({isDel:"0",createTime:{$gt:pretime,$lt:time},statusCode:0}).sort({likeNum:-1}).limit(20)
     let articleArr = []
     for(let i=0;i<allArticle.length;i++){
         let userId  = allArticle[i].userId
@@ -76,7 +76,7 @@ async function hot(req,res,updateTime){
     let time = req.query.time
     let pretime = time-updateTime
     // createTime:{$gt:pretime,$lt:time} 查询到的数据按点赞数量倒序排列，并且最多只返回20条数据
-    let allArticle = await Article.find({isDel:"0",createTime:{$gt:pretime,$lt:time}}).sort({likeNum:-1}).limit(5)
+    let allArticle = await Article.find({isDel:"0",createTime:{$gt:pretime,$lt:time},statusCode:0}).sort({likeNum:-1}).limit(5)
     let articleArr = []
     for(let i=0;i<allArticle.length;i++){
         let userId  = allArticle[i].userId

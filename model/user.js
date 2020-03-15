@@ -50,7 +50,9 @@ var userSchema = new Schema({
     statusCode:{
         type:Number,
         default:4
-    }
+    },
+    // 消息列表
+    message:[]
 })
 
 module.exports = mongoose.model('User',userSchema)

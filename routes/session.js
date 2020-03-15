@@ -117,9 +117,11 @@ router.get('/api/getUser',auth,async (req,res)=>{
         if(!article) continue;
         collectingArr.push(id)
     }
+    // console.log(req.user.message.length)
     return res.json({
         user:req.user,
-        collecting:collectingArr
+        collecting:collectingArr,
+        message:req.user.message.length
     })
 })
 module.exports = router

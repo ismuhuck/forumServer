@@ -51,8 +51,38 @@ router.post('/api/uploadImg',auth,upload.single('file'),async (req,res)=>{
     })
 })
 
+// 获取需要修改的文章
+router.get('/api/thiseditArticle',auth, async (req,res) => {
+    let id = ObjectId(req.query.id)
+    
+    try {
+        var article = await Article.findById(id)
+        var title = article.blogTitle
+        var content = article.content
+    } catch (error) {
+        return res.json(error)
+    }
+    res.json({
+        title:title,
+        content:content
+    })
+})
 
-
+router.post('/api/editArticle',auth,async (req ,res) => {
+    let id =ObjectId(req.body.id) 
+    try {
+        let article = await Article.findByIdAndUpdate(id,{$set:{blogTitle:req.body.blogTitle,content:req.body.content}},{new:true})
+    } catch (error) {
+        console.log(error)
+        return  res.json({
+            err:error
+        })
+    }
+    
+    res.json({
+        code:0
+    })
+})
 //  code 0: 成功 1：失败 2:点赞成功 3：取消点赞 4: 未发表任何文章 5：进入坛主的主页
 router.post('/api/createArticle', auth, async (req, res) => {
     let date = new Date()
@@ -81,7 +111,7 @@ router.post('/api/createArticle', auth, async (req, res) => {
 // 个人主页获取个人全部文章接口
 router.get('/api/getArticle', auth, (req, res) => {
     let id = req.user._id
-    Article.find({ userId: id, isDel: '0' }, (err, docs) => {
+    Article.find({ userId: id, isDel: '0' ,statusCode:0}, (err, docs) => {
         if (!err) {
             return res.json(docs)
         }
