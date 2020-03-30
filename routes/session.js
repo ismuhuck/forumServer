@@ -78,12 +78,12 @@ router.post('/api/login',async (req,res) => {
             msg:'因用户多次违反发言规则，账号已被注销'
         })
     }
-    if(user.statusCode === 4){
-        return res.status(200).json({
-            code:200,
-            msg: '正在审核中，请稍后尝试'
-        })
-    }
+    // if(user.statusCode === 4){
+    //     return res.status(200).json({
+    //         code:200,
+    //         msg: '正在审核中，请稍后尝试'
+    //     })
+    // }
     if(user.statusCode === 5){
         return res.status(200).json({
             code:300,

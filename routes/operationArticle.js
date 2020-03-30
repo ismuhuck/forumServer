@@ -408,7 +408,8 @@ router.post('/api/search',async (req, res) => {
             commentNum : article.comment.length,
             _id:article._id,
             userId:article.userId,
-            avatar:user.avatar
+            avatar:user.avatar,
+            nickName:user.nickName
         }
         articleArr.push(articlesObj)
     }
