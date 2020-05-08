@@ -9,7 +9,8 @@ const auth = async(req,res,next) => {
     const tokenData = jwt.verify(raw,SECRET)//验证token
     const {id} = tokenData
     req.user = await User.findById(id)
-    } catch (e) {
+    } 
+    catch (e) {
         return res.status(500).send({
             type: 'tokenErr',
             message: 'token异常'

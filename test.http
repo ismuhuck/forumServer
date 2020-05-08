@@ -6,7 +6,7 @@ POST  {{url}}/register
 {{json}}
 
 {
-    "email":"1562288394@qqs.com",
+    "email":"8@qq.com",
     "nickName":"咖咖ka",
     "password":"1234563"
 }
@@ -26,10 +26,11 @@ post {{url}}/login
 
 ###
 post {{url}}/createArticle
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMTQyZjdkMTFiODAzMjA2NDM3OWU0NSIsImlhdCI6MTU3ODM4MTE5MX0.J85NuPlEqHK9dJ2UwgbjN4Me7ZjJP0QVOM8dVQkHQCw
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlNmRkZmQ2ODYzY2I3MmM4YzA1ZWZhMCIsImlhdCI6MTU4NjA2NTg0OH0.qdUDSN1C1zXsOojC53zOd4gvN2gQ5dzk7Ody2xJ920Q
 {{json}}
 
 {
+    "blogTitle":"题目",
     "content":"文章内容"
 }
 
